@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "nova-iris",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "C:/Users/Luca-plan/Desktop/pessoal/nova iris",
+      "port": 5173
+    }
+  ]
+}
