@@ -205,9 +205,8 @@ body {
   filter: drop-shadow(0 0 8px rgba(150, 180, 255, 0.35));
 }
 
-/* bloco de texto + reel, alinhados à direita (linha fica à esquerda) */
-.approach-content,
-.reel {
+/* bloco de texto alinhado à direita (linha fica à esquerda) */
+.approach-content {
   position: relative;
   z-index: 1;
   width: min(720px, 100%);
@@ -292,53 +291,6 @@ body {
   background: #e7ecff;
 }
 
-/* box do reel de apresentação */
-.reel {
-  aspect-ratio: 16 / 9;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0c0c0e;
-  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
-}
-
-.reel-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.reel-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  color: rgba(255, 255, 255, 0.45);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  background:
-    radial-gradient(60% 60% at 50% 45%, rgba(60, 70, 110, 0.25), transparent 70%),
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0 14px, transparent 14px 28px);
-}
-
-.reel-play {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  color: #fff;
-  padding-left: 4px;
-}
-
 /* animação de entrada (disparada quando a seção entra na tela) */
 .approach .reveal {
   opacity: 0;
@@ -365,9 +317,6 @@ body {
 .approach.in-view .approach-cta.reveal {
   transition-delay: 0.4s;
 }
-.approach.in-view .reel.reveal {
-  transition-delay: 0.2s;
-}
 
 @media (max-width: 760px) {
   .approach-line {
@@ -377,4 +326,116 @@ body {
   .approach {
     padding: 16vh 6vw 12vh;
   }
+}
+
+/* ============================================================
+   Seção 3 — Reel que cresce com o scroll (pin/sticky + distorção)
+   ============================================================ */
+.reel-scroll {
+  position: relative;
+  /* altura extra = distância de scroll durante a qual o vídeo cresce */
+  height: 240vh;
+}
+
+.reel-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.reel-box {
+  position: absolute;
+  /* container de posição/tamanho (miniatura 16:9 à direita -> tela cheia).
+     overflow visível pra deixar o warp do vídeo "vazar" e ondular as bordas. */
+  left: 54vw;
+  top: 6vh;
+  width: 40vw;
+  height: 22.5vw; /* 16:9 no primeiro paint */
+  transform-origin: center center;
+  will-change: left, top, width, height;
+}
+
+/* a mídia (vídeo/placeholder) recebe o clip arredondado e o filtro de warp */
+.reel-media {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #0c0c0e;
+  box-shadow: 0 40px 110px -30px rgba(0, 0, 0, 0.85);
+  transform-origin: center center;
+  will-change: transform, filter;
+}
+
+/* wrapper interno que faz o overscan durante a transição */
+.reel-inner {
+  position: absolute;
+  inset: 0;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.reel-video,
+.reel-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.reel-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.reel-fallback {
+  background:
+    radial-gradient(70% 70% at 50% 45%, rgba(90, 100, 160, 0.35), transparent 70%),
+    linear-gradient(135deg, #14141a 0%, #0c0c10 60%, #0a0a0d 100%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0 16px, transparent 16px 32px);
+}
+
+/* overlay PLAY ⏵ REEL — aparece no fim da expansão */
+.reel-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 3vw, 56px);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  color: #fff;
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(36px, 8vw, 150px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  text-shadow: 0 6px 40px rgba(0, 0, 0, 0.5);
+}
+
+.reel-playbtn {
+  flex: 0 0 auto;
+  width: clamp(58px, 7vw, 124px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  color: #0a0a0c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.42em;
+  padding-left: 0.12em;
+  transition: transform 0.3s ease;
+}
+
+.reel-overlay:hover .reel-playbtn {
+  transform: scale(1.08);
 }

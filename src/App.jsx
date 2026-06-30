@@ -4,6 +4,7 @@ import Brain from './components/Brain'
 import HeroTitle from './components/HeroTitle'
 import StaggeredMenu from './components/StaggeredMenu'
 import ApproachSection from './components/ApproachSection'
+import ReelSection from './components/ReelSection'
 import pointer from './lib/pointer'
 
 const menuItems = [
@@ -87,6 +88,9 @@ export default function App() {
 
         {/* Seção 2 — abordagem (3D + motion + design + backend) */}
         <ApproachSection />
+
+        {/* Seção 3 — reel que cresce com o scroll */}
+        <ReelSection />
       </main>
     </>
   )

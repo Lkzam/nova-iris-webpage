@@ -3,10 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 // Segunda seção da página. Aparece ao rolar pra baixo.
 // - texto com animação de entrada (IntersectionObserver)
 // - uma linha SVG que se "desenha" conforme o scroll avança na seção
-// - box do reel: já pronta pra receber um vídeo. Quando você tiver o reel,
-//   é só colocar o arquivo em public/ e passar o caminho na prop `videoSrc`
-//   (ex.: <ApproachSection videoSrc="/reel.mp4" />). Sem vídeo, mostra um placeholder.
-export default function ApproachSection({ videoSrc, poster }) {
+export default function ApproachSection() {
   const sectionRef = useRef(null)
   const pathRef = useRef(null)
   const [inView, setInView] = useState(false)
@@ -97,25 +94,6 @@ export default function ApproachSection({ videoSrc, poster }) {
         <a className="approach-cta reveal" href="#contato">
           Vamos conversar
         </a>
-      </div>
-
-      <div className="reel reveal">
-        {videoSrc ? (
-          <video
-            className="reel-video"
-            src={videoSrc}
-            poster={poster}
-            autoPlay
-            loop
-            muted
-            playsInline
-          />
-        ) : (
-          <div className="reel-placeholder">
-            <span className="reel-play">▶</span>
-            <span>Reel de apresentação em breve</span>
-          </div>
-        )}
       </div>
     </section>
   )
