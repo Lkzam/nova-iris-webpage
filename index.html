@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NOVA IRIS — A new era of interaction</title>
+    <link rel="icon" type="image/svg+xml" href="logo-branca.svg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -70,6 +71,11 @@
         animation: loaderSpin 0.9s linear infinite;
       }
       @keyframes loaderSpin { to { transform: rotate(360deg); } }
+      .loader-mark {
+        width: 54px;
+        height: 54px;
+        color: #fff;
+      }
       .loader-logo {
         font-family: Assistant, sans-serif;
         font-weight: 600;
@@ -152,6 +158,18 @@
         left: 50%; top: 50%;
         transform: translate(-50%, -50%);
       }
+      .nav-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .brand-mark {
+        width: 24px;
+        height: 24px;
+        color: #fff;
+        display: block;
+        flex: none;
+      }
       .nav-logo {
         font-family: Assistant, sans-serif;
         font-weight: 600;
@@ -159,7 +177,6 @@
         letter-spacing: 0.2em;
         text-transform: uppercase;
         color: #fff;
-        padding-left: 0.2em;
       }
 
       .card-nav-cta-button {
@@ -718,11 +735,63 @@
       #galaxy .top-label { margin-bottom: 40px; }
       #galaxy .title { max-width: 1000px; }
       #galaxy .subtitle { margin-bottom: 32px; }
+
+      /* ---------- Mobile / small screens ---------- */
+      @media (max-width: 640px) {
+        /* Titles: smaller floor so long PT headings don't eat the screen */
+        .title-hero, .title-galaxy { font-size: clamp(28px, 8.5vw, 44px); }
+        .title-wave { font-size: clamp(26px, 8vw, 40px); }
+        .subtitle { font-size: clamp(14px, 3.8vw, 16px); margin-bottom: 32px; }
+
+        /* Hero */
+        #hero { padding: 0 22px; }
+        #hero .top-label { margin-bottom: 28px; }
+        #hero .title { margin-bottom: 20px; }
+
+        /* Projetos: smaller cards + title floats a touch higher */
+        .proj-head { top: 5vh; gap: 10px; }
+        .project-card { width: clamp(160px, 58vw, 280px); }
+        .project-thumb { aspect-ratio: 16 / 9; }
+        .project-name { font-size: 15px; }
+        .project-foot { padding: 12px 14px; }
+
+        /* Redes (ex-wave): comfortable stacked spacing */
+        #wave { padding: 0 24px; gap: 24px; }
+        #wave .subtitle { margin-bottom: 28px; }
+
+        /* Contato (ex-galaxy) */
+        #galaxy { padding: 12vh 22px; }
+        #galaxy .top-label { margin-bottom: 24px; }
+
+        /* Buttons: tighter and allowed to wrap full width */
+        .btn-row { gap: 12px; width: 100%; }
+        .btn-primary, .btn-secondary {
+          height: 52px;
+          font-size: 14px;
+          max-width: 100%;
+        }
+        .btn-secondary { padding: 0 20px; }
+        .btn-primary { padding: 0 12px 0 22px; }
+
+        /* Scroll hint a bit smaller */
+        .scroll-arrow { width: 22px; height: 22px; }
+      }
+
+      /* Respect users who prefer less motion */
+      @media (prefers-reduced-motion: reduce) {
+        .scroll-arrow { animation: none; }
+        .loader-ring { animation-duration: 1.6s; }
+      }
     </style>
   </head>
 
   <body>
     <div id="loader">
+      <svg class="brand-mark loader-mark" viewBox="0 0 1200 1200" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <g transform="matrix(2.506324,0,0,2.506324,-851.586719,-891.099687)"><path d="M343.191,815.432L498.833,412.319L601.556,558.623C601.556,558.623 554.864,521.268 542.412,560.179L480.156,717.377L343.191,815.432Z"/></g>
+        <g transform="matrix(-2.506324,0,0,-2.506324,2034.852432,2105.664531)"><path d="M343.191,815.432L498.833,412.319L601.556,558.623C601.556,558.623 554.864,521.268 542.412,560.179L480.156,717.377L343.191,815.432Z"/></g>
+        <g transform="matrix(-0.419517,1.229383,-1.229383,-0.419517,1112.518145,74.546694)"><path d="M519.066,178.856C519.066,178.856 519.066,236.444 455.253,238C455.253,238 522.179,248.895 519.844,302.591C519.844,302.591 526.848,234.887 583.658,238.778C583.658,238.778 522.179,238 519.066,178.856Z"/></g>
+      </svg>
       <div class="loader-ring" aria-hidden="true"></div>
       <div class="loader-logo">NOVA IRIS</div>
     </div>
@@ -738,7 +807,16 @@
             <div class="hamburger-line"></div>
             <div class="hamburger-line"></div>
           </div>
-          <div class="logo-container"><span class="nav-logo">NOVA IRIS</span></div>
+          <div class="logo-container">
+            <span class="nav-brand">
+              <svg class="brand-mark" viewBox="0 0 1200 1200" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <g transform="matrix(2.506324,0,0,2.506324,-851.586719,-891.099687)"><path d="M343.191,815.432L498.833,412.319L601.556,558.623C601.556,558.623 554.864,521.268 542.412,560.179L480.156,717.377L343.191,815.432Z"/></g>
+                <g transform="matrix(-2.506324,0,0,-2.506324,2034.852432,2105.664531)"><path d="M343.191,815.432L498.833,412.319L601.556,558.623C601.556,558.623 554.864,521.268 542.412,560.179L480.156,717.377L343.191,815.432Z"/></g>
+                <g transform="matrix(-0.419517,1.229383,-1.229383,-0.419517,1112.518145,74.546694)"><path d="M519.066,178.856C519.066,178.856 519.066,236.444 455.253,238C455.253,238 522.179,248.895 519.844,302.591C519.844,302.591 526.848,234.887 583.658,238.778C583.658,238.778 522.179,238 519.066,178.856Z"/></g>
+              </svg>
+              <span class="nav-logo">NOVA IRIS</span>
+            </span>
+          </div>
           <a class="card-nav-cta-button" href="https://wa.me/5519971601315?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Nova%20Iris%20e%20quero%20conversar." target="_blank" rel="noopener">Fale conosco</a>
         </div>
 
@@ -1012,16 +1090,19 @@
         grid.style.visibility = projOpacity > 0 ? 'visible' : 'hidden';
         if (projOpacity > 0) {
           const N = projectCards.length;
+          const mob = innerWidth < 768;
           const prog = (cs - 0.025) / 0.415;
-          const globalYOffset = 340 - prog * 680;   // gentler vertical sweep
+          // Tighter vertical sweep + stagger on phones so cards stay on the short screen.
+          const globalYOffset = (mob ? 210 : 340) - prog * (mob ? 420 : 680);
           const baseAngle = prog * Math.PI * 2 * 1.0; // one calmer full turn
           const cx = innerWidth / 2, cy = innerHeight / 2;
-          const rx = Math.min(innerWidth * 0.32, 380), ry = 110;
+          const rx = Math.min(innerWidth * (mob ? 0.30 : 0.32), 380), ry = mob ? 68 : 110;
+          const staggerStep = mob ? 72 : 110;
           projectCards.forEach((el, i) => {
             const angle = baseAngle + i * ((2 * Math.PI) / N);
             const depth = 0.5 + 0.5 * Math.sin(angle); // 0 (back) .. 1 (front)
             const x = cx + Math.cos(angle) * rx;
-            const yStagger = (i - (N - 1) / 2) * 110;
+            const yStagger = (i - (N - 1) / 2) * staggerStep;
             const y = cy + Math.sin(angle) * ry + globalYOffset + yStagger;
             const scale = 0.82 + 0.18 * depth;
             const opacity = 0.4 + 0.6 * Math.sin(angle); // back cards fade to invisible
@@ -1503,6 +1584,10 @@
       scene.background = new THREE.Color(0x000000);
       const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1000);
       camera.position.z = 8;
+      // Phones: lighter GPU load (fewer particles + lower DPR) so it stays smooth.
+      const isMobile = window.matchMedia('(max-width: 768px)').matches
+        || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
       const renderer = new THREE.WebGLRenderer({
         canvas,
         antialias: false,               // bloom + soft round points make MSAA redundant
@@ -1510,7 +1595,7 @@
         powerPreference: 'high-performance',
       });
       renderer.setSize(innerWidth, innerHeight);
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // cap DPR — big fill-rate win
+      renderer.setPixelRatio(Math.min(devicePixelRatio, isMobile ? 1.25 : 1.5)); // cap DPR — big fill-rate win
       renderer.autoClear = false;
 
       // Aurora background
@@ -1531,7 +1616,9 @@
       bgScene.add(new THREE.Mesh(bgGeometry, bgMaterial));
 
       // Particle cloud
-      const geometry = new THREE.SphereGeometry(4.2, 180, 420); // ~76k pts (was ~120k)
+      const geometry = isMobile
+        ? new THREE.SphereGeometry(4.2, 140, 300)  // ~42k pts on phones
+        : new THREE.SphereGeometry(4.2, 180, 420); // ~76k pts on desktop
       const material = new THREE.ShaderMaterial({
         uniforms: { uTime: { value: 0 }, uScroll: { value: 0 }, uIntro: { value: 0 } },
         vertexShader: particleVertexShader,
