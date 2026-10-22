@@ -510,95 +510,280 @@
         color: #a0a0a0;
       }
 
-      /* ---------- Projetos (scroll-reactive orbit) ---------- */
+      /* Invisible sections must not catch clicks (opacity alone keeps
+         hit-testing on, so their buttons were clickable site-wide). */
+      .overlay.section:not(.is-visible) a,
+      .overlay.section:not(.is-visible) button { pointer-events: none; }
+
+      /* ---------- Projetos em destaque (home) ---------- */
+      /* A calm, readable list on the left while the DNA forms on the right;
+         the full portfolio lives on its own page (/projetos). */
       #projetos {
         z-index: 10;
-        perspective: 1400px;
-      }
-      /* Title + eyebrow float at the top and parallax with scroll (JS-driven). */
-      .proj-head {
-        position: absolute;
-        top: 7vh;
-        left: 0;
-        right: 0;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 14px;
-        text-align: center;
-        padding: 0 20px;
-        will-change: transform;
+        padding: 0 7vw;
       }
-      #projetos .title { justify-content: center; }
-
-      /* Orbit layer — cards positioned every frame by JS. */
-      .project-grid {
+      /* Soft dark wash on the left so the list reads over the funnel phase. */
+      #projetos::before {
+        content: '';
         position: absolute;
         inset: 0;
-        pointer-events: none;
-        transform-style: preserve-3d;
+        z-index: -1;
+        background: linear-gradient(90deg, rgba(3,3,5,0.82) 0%, rgba(3,3,5,0.55) 38%, rgba(3,3,5,0) 62%);
         opacity: 0;
-        visibility: hidden; /* toggled visible only while the section is active */
+        transition: opacity 1s ease;
       }
+      #projetos.is-visible::before { opacity: 1; }
+      .feat {
+        width: min(560px, 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+        will-change: transform;
+      }
+      #projetos .title { justify-content: flex-start; }
+      #projetos .subtitle { margin-bottom: 8px; }
+      .feat-list {
+        list-style: none;
+        width: 100%;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        opacity: 0;
+        transition: opacity 0.9s ease;
+      }
+      /* The list's top rule isn't on a row, so it must fade with the section
+         or it stays pinned on screen for the rest of the scroll. */
+      #projetos.is-visible .feat-list { opacity: 1; }
+      .feat-row {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 40px 1fr auto 22px;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 6px;
+        border: 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        background: transparent;
+        color: #fff;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          opacity 0.9s cubic-bezier(0.2, 1, 0.2, 1),
+          transform 0.9s cubic-bezier(0.2, 1, 0.2, 1),
+          background 0.3s ease;
+      }
+      .feat-row.in { opacity: 1; transform: translateY(0); }
+      .feat-row:not(.in) { pointer-events: none !important; }
+      .feat-row:hover { background: linear-gradient(90deg, rgba(141,169,252,0.08), rgba(141,169,252,0)); }
+      .feat-num {
+        font-size: 12px;
+        color: #8da9fc;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.08em;
+      }
+      .feat-name {
+        font-family: Assistant, sans-serif;
+        font-weight: 600;
+        font-size: clamp(20px, 1.9vw, 28px);
+        letter-spacing: -0.02em;
+        transition: transform 0.4s cubic-bezier(0.2, 1, 0.2, 1);
+      }
+      .feat-row:hover .feat-name { transform: translateX(8px); }
+      .feat-tag { font-size: 13px; color: #a0a0a0; white-space: nowrap; }
+      .feat-arrow {
+        width: 18px;
+        height: 18px;
+        color: #ffa091;
+        transition: transform 0.4s cubic-bezier(0.2, 1, 0.2, 1);
+      }
+      .feat-row:hover .feat-arrow { transform: rotate(45deg); }
+      .feat-cta {
+        margin-top: 18px;
+        opacity: 0;
+        transform: translateY(24px);
+        transition: all 0.9s cubic-bezier(0.2, 1, 0.2, 1);
+      }
+      .feat-cta.in { opacity: 1; transform: translateY(0); }
+      .feat-cta:not(.in) { pointer-events: none !important; }
 
-      .project-card {
-        pointer-events: auto;
-        position: absolute;
+      /* Hover preview that trails the cursor (desktop only). */
+      .feat-preview {
+        position: fixed;
         left: 0;
         top: 0;
-        will-change: transform, opacity;
-        width: clamp(260px, 30vw, 400px);
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 20px;
-        /* No backdrop-filter: these move every frame, and blurring the
-           backdrop per-frame is the single biggest cause of jank. A solid
-           translucent fill reads just as well while they orbit. */
-        background: rgba(10,12,20,0.9);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-        overflow: hidden;
-        cursor: pointer;
-        text-align: left;
-        font-family: Inter, sans-serif;
-        transition: border-color 0.25s ease, box-shadow 0.25s ease;
-      }
-      .project-card:hover {
-        border-color: rgba(255,255,255,0.35);
-        box-shadow: 0 14px 44px rgba(0,0,0,0.55);
-      }
-      .project-thumb {
-        position: relative;
-        width: 100%;
+        z-index: 11;
+        width: 340px;
         aspect-ratio: 16 / 10;
-        background: #0a0c14 center/cover no-repeat;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.14);
         overflow: hidden;
+        background: #0a0c14;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+        pointer-events: none;
+        opacity: 0;
+        scale: 0.9;
+        transition: opacity 0.3s ease, scale 0.4s cubic-bezier(0.2, 1, 0.2, 1);
+        will-change: transform;
       }
-      .project-thumb img {
+      .feat-preview.on { opacity: 1; scale: 1; }
+      .feat-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      @media (hover: none), (max-width: 900px) { .feat-preview { display: none; } }
+
+      /* ---------- Página /projetos ---------- */
+      #page-projetos { display: none; position: relative; z-index: 10; min-height: 100vh; }
+      body[data-route="projetos"] #page-projetos { display: block; }
+      body[data-route="projetos"] #home-main { display: none; }
+      #home-main, #page-projetos { transition: opacity 0.45s ease; }
+      body.is-transitioning #home-main,
+      body.is-transitioning #page-projetos { opacity: 0; pointer-events: none; }
+
+      /* Darkens the galaxy so the grid stays readable. */
+      #page-scrim {
+        position: fixed;
+        inset: 0;
+        z-index: -5;
+        pointer-events: none;
+        opacity: 0;
+        background: radial-gradient(ellipse at 50% 35%, rgba(3,3,5,0.3), rgba(3,3,5,0.82) 75%);
+        transition: opacity 0.8s ease;
+      }
+      body[data-route="projetos"] #page-scrim { opacity: 1; }
+
+      .pp-inner { max-width: 1200px; margin: 0 auto; padding: 150px 24px 90px; }
+      .pp-head {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 22px;
+        margin-bottom: 56px;
+      }
+      .pp-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #a0a0a0;
+        font-size: 14px;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      .pp-back:hover { color: #fff; }
+      #page-projetos .title { justify-content: flex-start; }
+      .pp-head-row {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .pp-head-row .subtitle { margin-bottom: 0; }
+      .pp-filters { display: flex; flex-wrap: wrap; gap: 10px; }
+      .pp-filter {
+        height: 40px;
+        padding: 0 18px;
+        border-radius: 9999px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: rgba(255,255,255,0.7);
+        font: 500 14px Inter, sans-serif;
+        cursor: pointer;
+        transition: all 0.25s ease;
+      }
+      .pp-filter sup { font-size: 10px; margin-left: 4px; color: #8da9fc; }
+      .pp-filter:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
+      .pp-filter.active {
+        color: #fff;
+        background: rgba(141,169,252,0.14);
+        border-color: rgba(141,169,252,0.5);
+      }
+
+      .pp-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 28px;
+      }
+      .pp-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(10,12,20,0.72);
+        color: #fff;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(40px);
+        transition:
+          opacity 0.9s cubic-bezier(0.2, 1, 0.2, 1),
+          transform 0.9s cubic-bezier(0.2, 1, 0.2, 1),
+          border-color 0.3s ease;
+      }
+      .pp-card[hidden] { display: none; }
+      .pp-card.in { opacity: 1; transform: translateY(0); }
+      .pp-card:hover { border-color: rgba(255,255,255,0.22); }
+      .pp-card .ring { opacity: 0; transition: opacity 0.35s ease; z-index: 2; }
+      .pp-card:hover .ring { opacity: 1; }
+      .pp-media {
+        position: relative;
+        aspect-ratio: 16 / 10;
+        overflow: hidden;
+        background: #0a0c14;
+      }
+      .pp-media img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
-        transition: transform 0.5s cubic-bezier(0.2, 1, 0.2, 1);
+        transition: transform 0.8s cubic-bezier(0.2, 1, 0.2, 1);
       }
-      .project-card:hover .project-thumb img { transform: scale(1.05); }
-      .project-foot {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 16px 18px;
+      .pp-card:hover .pp-media img { transform: scale(1.04); }
+      .pp-body {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: baseline;
+        gap: 8px 16px;
+        padding: 22px 24px 26px;
       }
-      .project-name {
+      .pp-num { font-size: 13px; color: #8da9fc; font-variant-numeric: tabular-nums; }
+      .pp-name {
         font-family: Assistant, sans-serif;
         font-weight: 600;
-        font-size: clamp(16px, 1.3vw, 19px);
-        color: #fff;
-        letter-spacing: -0.01em;
+        font-size: clamp(22px, 2vw, 30px);
+        letter-spacing: -0.02em;
       }
-      .project-tag {
-        font-size: clamp(11px, 0.85vw, 12px);
-        color: #8da9fc;
-        white-space: nowrap;
+      .pp-tag { font-size: 13px; color: #a0a0a0; white-space: nowrap; }
+      .pp-desc {
+        grid-column: 2 / -1;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #a0a0a0;
       }
+
+      .pp-cta {
+        margin-top: 110px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 28px;
+        text-align: center;
+      }
+      .pp-cta h2 {
+        font-family: Assistant, sans-serif;
+        font-weight: 400;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        font-size: clamp(30px, 4vw, 56px);
+        max-width: 760px;
+      }
+      .pp-cta .btn-row { justify-content: center; }
 
       /* ---------- Project modal (case study) ---------- */
       #project-modal {
@@ -700,6 +885,7 @@
         .pm-panel { flex-direction: column-reverse; height: min(86vh, 720px); }
         .pm-left { justify-content: flex-start; gap: 14px; }
         .pm-right { flex-basis: 42%; }
+        .pp-grid { grid-template-columns: 1fr; }
       }
 
       /* ---------- Wave ---------- */
@@ -748,12 +934,24 @@
         #hero .top-label { margin-bottom: 28px; }
         #hero .title { margin-bottom: 20px; }
 
-        /* Projetos: smaller cards + title floats a touch higher */
-        .proj-head { top: 5vh; gap: 10px; }
-        .project-card { width: clamp(160px, 58vw, 280px); }
-        .project-thumb { aspect-ratio: 16 / 9; }
-        .project-name { font-size: 15px; }
-        .project-foot { padding: 12px 14px; }
+        /* Destaques: full width, with a dark backing since the DNA sits behind */
+        #projetos { padding: 0 16px; }
+        .feat {
+          padding: 22px 18px;
+          border-radius: 20px;
+          background: rgba(3,3,5,0);
+          transition: background 0.9s ease;
+        }
+        #projetos.is-visible .feat { background: rgba(3,3,5,0.55); }
+        .feat-row { grid-template-columns: 30px 1fr 18px; gap: 12px; padding: 15px 2px; }
+        .feat-tag { display: none; }
+
+        /* Página /projetos */
+        .pp-inner { padding: 120px 16px 70px; }
+        .pp-head { margin-bottom: 36px; }
+        .pp-grid { grid-template-columns: 1fr; gap: 20px; }
+        .pp-body { padding: 18px 18px 22px; }
+        .pp-cta { margin-top: 80px; }
 
         /* Redes (ex-wave): comfortable stacked spacing */
         #wave { padding: 0 24px; gap: 24px; }
@@ -808,14 +1006,14 @@
             <div class="hamburger-line"></div>
           </div>
           <div class="logo-container">
-            <span class="nav-brand">
+            <a class="nav-brand" href="/" data-route="home" aria-label="Nova Iris — início" style="text-decoration:none">
               <svg class="brand-mark" viewBox="0 0 1200 1200" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                 <g transform="matrix(2.506324,0,0,2.506324,-851.586719,-891.099687)"><path d="M343.191,815.432L498.833,412.319L601.556,558.623C601.556,558.623 554.864,521.268 542.412,560.179L480.156,717.377L343.191,815.432Z"/></g>
                 <g transform="matrix(-2.506324,0,0,-2.506324,2034.852432,2105.664531)"><path d="M343.191,815.432L498.833,412.319L601.556,558.623C601.556,558.623 554.864,521.268 542.412,560.179L480.156,717.377L343.191,815.432Z"/></g>
                 <g transform="matrix(-0.419517,1.229383,-1.229383,-0.419517,1112.518145,74.546694)"><path d="M519.066,178.856C519.066,178.856 519.066,236.444 455.253,238C455.253,238 522.179,248.895 519.844,302.591C519.844,302.591 526.848,234.887 583.658,238.778C583.658,238.778 522.179,238 519.066,178.856Z"/></g>
               </svg>
               <span class="nav-logo">NOVA IRIS</span>
-            </span>
+            </a>
           </div>
           <a class="card-nav-cta-button" href="https://wa.me/5519971601315?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Nova%20Iris%20e%20quero%20conversar." target="_blank" rel="noopener">Fale conosco</a>
         </div>
@@ -827,8 +1025,11 @@
               <a class="nav-card-link" data-scroll="0" tabindex="-1" aria-label="Ir para o início">
                 <svg class="nav-card-link-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>Início
               </a>
-              <a class="nav-card-link" data-scroll="0.22" tabindex="-1" aria-label="Ir para projetos">
-                <svg class="nav-card-link-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>Projetos
+              <a class="nav-card-link" data-scroll="0.18" tabindex="-1" aria-label="Ir para os projetos em destaque">
+                <svg class="nav-card-link-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>Destaques
+              </a>
+              <a class="nav-card-link" href="/projetos" data-route="projetos" tabindex="-1" aria-label="Ver todos os projetos">
+                <svg class="nav-card-link-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>Todos os projetos
               </a>
               <a class="nav-card-link" data-scroll="0.55" tabindex="-1" aria-label="Ir para redes sociais">
                 <svg class="nav-card-link-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>Redes sociais
@@ -868,7 +1069,9 @@
       </nav>
     </header>
 
-    <main>
+    <div id="page-scrim" aria-hidden="true"></div>
+
+    <main id="home-main">
       <!-- 1. HERO -->
       <section id="hero" class="overlay section" aria-label="Introduction">
         <span class="top-label reveal">
@@ -888,19 +1091,27 @@
         </div>
       </section>
 
-      <!-- 2. PROJETOS -->
-      <section id="projetos" class="overlay section" aria-label="Projetos">
-        <div class="proj-head">
+      <!-- 2. PROJETOS EM DESTAQUE (a lista completa fica em /projetos) -->
+      <section id="projetos" class="overlay section" aria-label="Projetos em destaque">
+        <div class="feat">
           <span class="top-label reveal">
             <span class="ring ring-eyebrow"></span>
             <svg class="layers-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
             </svg>
-            Projetos reais que já entregamos
+            Projetos em destaque
           </span>
-          <h2 class="title title-hero" data-text="PROJETOS"></h2>
+          <h2 class="title title-wave" data-text="Trabalhos selecionados"></h2>
+          <p class="subtitle reveal">Alguns dos sistemas e sites que já saíram do papel e estão no ar.</p>
+          <ul class="feat-list" id="feat-list"><!-- rows injected by JS --></ul>
+          <a class="btn-primary feat-cta" href="/projetos" data-route="projetos">
+            Ver todos os projetos
+            <span class="arrow-badge">
+              <span class="ring"></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </span>
+          </a>
         </div>
-        <div class="project-grid" id="project-grid"><!-- cards injected by JS --></div>
       </section>
 
       <!-- 3. WAVE -->
@@ -970,6 +1181,48 @@
       <div class="spacer" aria-hidden="true"></div>
     </main>
 
+    <div class="feat-preview" id="feat-preview" aria-hidden="true"><img alt="" /></div>
+
+    <!-- PÁGINA /projetos — rolagem normal, a galáxia fica girando ao fundo -->
+    <section id="page-projetos" class="section" aria-label="Todos os projetos">
+      <div class="pp-inner">
+        <header class="pp-head">
+          <a class="pp-back reveal" href="/" data-route="home">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+            Voltar ao início
+          </a>
+          <span class="top-label reveal">
+            <span class="ring ring-eyebrow"></span>
+            <svg class="layers-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            Portfólio
+          </span>
+          <h1 class="title title-hero" data-text="Nossos projetos"></h1>
+          <div class="pp-head-row">
+            <p class="subtitle reveal">Sistemas com backend de verdade e sites com movimento — tudo o que a Nova Iris já colocou no ar.</p>
+            <div class="pp-filters reveal" id="pp-filters" role="group" aria-label="Filtrar projetos"></div>
+          </div>
+        </header>
+
+        <div class="pp-grid" id="pp-grid"><!-- cards injected by JS --></div>
+
+        <div class="pp-cta">
+          <h2>Tem um projeto em mente? Vamos tirar do papel.</h2>
+          <div class="btn-row">
+            <a class="btn-primary" href="https://wa.me/5519971601315?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Nova%20Iris%20e%20quero%20conversar." target="_blank" rel="noopener">
+              Converse conosco
+              <span class="arrow-badge">
+                <span class="ring"></span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+              </span>
+            </a>
+            <a class="btn-secondary" href="mailto:novairis150405@gmail.com">novairis150405@gmail.com</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- PROJECT CASE-STUDY MODAL -->
     <div id="project-modal" aria-hidden="true" role="dialog" aria-modal="true">
       <div class="pm-backdrop" data-close></div>
@@ -1033,17 +1286,20 @@
         projetos: document.querySelector('#projetos .title'),
         wave: document.querySelector('#wave .title'),
         galaxy: document.querySelector('#galaxy .title'),
+        page: document.querySelector('#page-projetos .title'),
       };
       Object.values(titles).forEach(buildTitle);
 
       const heroSection = document.getElementById('hero');
       const projetosSection = document.getElementById('projetos');
-      const projHead = document.querySelector('#projetos .proj-head');
+      const featBox = document.querySelector('#projetos .feat');
+      const featCta = document.querySelector('#projetos .feat-cta');
+      const pageSection = document.getElementById('page-projetos');
       const waveSection = document.getElementById('wave');
       const galaxySection = document.getElementById('galaxy');
       const glow = document.getElementById('glow');
 
-      const played = { hero: false, projetos: false, wave: false, galaxy: false };
+      const played = { hero: false, projetos: false, wave: false, galaxy: false, page: false };
 
       function setSectionState(section, state /* 'before' | 'visible' | 'after' */) {
         section.classList.toggle('is-visible', state === 'visible');
@@ -1059,59 +1315,31 @@
         if (cs < 0.02) setSectionState(heroSection, 'visible');
         else setSectionState(heroSection, 'after');
 
-        // Projetos: title/eyebrow reveal + scroll-reactive card orbit
+        // Destaques: the section holds while the DNA forms; rows enter one by
+        // one with scroll (and leave in reverse when scrolling back up).
+        const featVisible = cs >= 0.025 && cs <= 0.42;
         if (cs < 0.025) {
           setSectionState(projetosSection, 'before');
-        } else if (cs <= 0.44) {
+        } else if (featVisible) {
           setSectionState(projetosSection, 'visible');
           if (!played.projetos) { titles.projetos.classList.add('play'); played.projetos = true; }
         } else {
           setSectionState(projetosSection, 'after');
         }
+        const featProg = Math.min(Math.max((cs - 0.025) / 0.12, 0), 1);
+        featRows.forEach((r, i) => r.classList.toggle('in', featVisible && featProg > 0.1 + i * 0.18));
+        featCta.classList.toggle('in', featVisible && featProg > 0.1 + featRows.length * 0.18);
+        if (!featVisible) hidePreview();
 
-        // Head parallax — the title/eyebrow drift up as you scroll through.
-        {
-          const p = Math.min(Math.max((cs - 0.025) / 0.40, 0), 1);
-          projHead.style.transform = `translateY(${40 - p * 130}px)`;
-        }
+        // Gentle parallax on the whole block while the section holds.
+        const featPar = Math.min(Math.max((cs - 0.025) / 0.395, 0), 1);
+        featBox.style.transform = `translateY(${30 - featPar * 60}px)`;
 
-        // Card orbit — the 6 project cards spiral around the forming DNA,
-        // positioned every frame from the scroll value (like the old cards).
-        // Starts early (0.025) with a gentler vertical sweep so more cards
-        // stay on screen through the window.
-        let projOpacity = 0;
-        if (cs > 0.025 && cs < 0.44) {
-          projOpacity = Math.min((cs - 0.025) / 0.025, 1);
-          if (cs > 0.40) projOpacity = Math.max(1 - (cs - 0.40) / 0.04, 0);
-        }
-        grid.style.opacity = projOpacity;
-        // visibility (not just opacity) gates hit-testing — otherwise the
-        // invisible cards stay clickable across the whole site.
-        grid.style.visibility = projOpacity > 0 ? 'visible' : 'hidden';
-        if (projOpacity > 0) {
-          const N = projectCards.length;
-          const mob = innerWidth < 768;
-          const prog = (cs - 0.025) / 0.415;
-          // Tighter vertical sweep + stagger on phones so cards stay on the short screen.
-          const globalYOffset = (mob ? 210 : 340) - prog * (mob ? 420 : 680);
-          const baseAngle = prog * Math.PI * 2 * 1.0; // one calmer full turn
-          const cx = innerWidth / 2, cy = innerHeight / 2;
-          const rx = Math.min(innerWidth * (mob ? 0.30 : 0.32), 380), ry = mob ? 68 : 110;
-          const staggerStep = mob ? 72 : 110;
-          projectCards.forEach((el, i) => {
-            const angle = baseAngle + i * ((2 * Math.PI) / N);
-            const depth = 0.5 + 0.5 * Math.sin(angle); // 0 (back) .. 1 (front)
-            const x = cx + Math.cos(angle) * rx;
-            const yStagger = (i - (N - 1) / 2) * staggerStep;
-            const y = cy + Math.sin(angle) * ry + globalYOffset + yStagger;
-            const scale = 0.82 + 0.18 * depth;
-            const opacity = 0.4 + 0.6 * Math.sin(angle); // back cards fade to invisible
-            el.style.transform = `translate(-50%,-50%) translate3d(${x}px,${y}px,0) scale(${scale}) rotateY(${angle - Math.PI / 2}rad)`;
-            el.style.opacity = opacity;
-            el.style.zIndex = Math.round(scale * 100);
-            // Don't let near-invisible back-of-orbit cards catch clicks.
-            el.style.pointerEvents = opacity > 0.15 ? 'auto' : 'none';
-          });
+        // How much to slide the particles right so the DNA sits beside the list.
+        featShiftTarget = 0;
+        if (cs > 0.01 && cs < 0.46) {
+          featShiftTarget = Math.min((cs - 0.01) / 0.05, 1);
+          if (cs > 0.40) featShiftTarget = Math.max(1 - (cs - 0.40) / 0.06, 0);
         }
 
         // Wave: before < 0.48, visible 0.48–0.62, after > 0.62
@@ -1136,40 +1364,48 @@
       /* =========================================================
          PROJECTS — cards + case-study modal
       ========================================================= */
+      // cat drives the filters on /projetos; the first FEATURED_COUNT
+      // entries are the ones listed on the home.
       const projects = [
         {
           name: 'Bico Jobs',
           url: 'https://bico-jobs.vercel.app/',
+          cat: 'sistema',
           tag: 'Marketplace • Backend',
           desc: 'Plataforma que conecta profissionais e clientes de serviços, com autenticação e dados em tempo real — front-end fluido apoiado por um backend de verdade.',
         },
         {
           name: 'XML Bot',
           url: 'https://xml-bot.vercel.app/',
+          cat: 'sistema',
           tag: 'Automação',
           desc: 'Ferramenta para processar e automatizar fluxos de XML de forma rápida e visual, transformando tarefas repetitivas em poucos cliques.',
         },
         {
           name: 'Titta Gastronomia',
           url: 'https://titta-gastronomia.vercel.app/',
+          cat: 'site',
           tag: 'Site • Gastronomia',
           desc: 'Site de gastronomia com identidade forte e navegação leve, feito para apresentar a marca e o cardápio de forma apetitosa.',
         },
         {
           name: 'Sushi do Cisco',
           url: 'https://sushi-do-cisco.vercel.app/',
+          cat: 'site',
           tag: 'Site • Delivery',
           desc: 'Página para restaurante de sushi com visual marcante e foco em conversão, guiando o cliente do primeiro olhar até o pedido.',
         },
         {
           name: 'Intui Yoga',
           url: 'https://intuiryoga.vercel.app/',
+          cat: 'site',
           tag: 'Site • Bem-estar',
           desc: 'Experiência calma e imersiva para um estúdio de yoga, unindo estética serena e clareza de informação.',
         },
         {
           name: 'Portfólio Eliana',
           url: 'https://portfolio-eliana.vercel.app/',
+          cat: 'site',
           tag: 'Portfólio',
           desc: 'Portfólio pessoal elegante, destacando trabalhos e trajetória com uma navegação leve e refinada.',
         },
@@ -1179,23 +1415,131 @@
       const shot = (url, w, h) =>
         `https://s.wordpress.com/mshots/v1/${encodeURIComponent(url)}?w=${w}&h=${h}`;
 
-      const grid = document.getElementById('project-grid');
-      grid.innerHTML = projects
+      const num = (i) => String(i + 1).padStart(2, '0');
+      const arrowSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>';
+
+      // Home — featured list
+      const FEATURED_COUNT = 4;
+      const featList = document.getElementById('feat-list');
+      featList.innerHTML = projects
+        .slice(0, FEATURED_COUNT)
         .map(
           (p, i) => `
-        <button class="project-card" data-i="${i}" aria-label="Abrir projeto ${p.name}">
-          <div class="project-thumb">
-            <img loading="lazy" src="${shot(p.url, 800, 500)}" alt="Prévia do site ${p.name}" />
+        <li><button class="feat-row" data-i="${i}" aria-label="Abrir projeto ${p.name}">
+          <span class="feat-num">${num(i)}</span>
+          <span class="feat-name">${p.name}</span>
+          <span class="feat-tag">${p.tag}</span>
+          <span class="feat-arrow">${arrowSvg}</span>
+        </button></li>`
+        )
+        .join('');
+      const featRows = [...featList.querySelectorAll('.feat-row')];
+      let featShiftTarget = 0;
+
+      // Cursor-trailing preview (positioned from the render loop).
+      const preview = document.getElementById('feat-preview');
+      const previewImg = preview.querySelector('img');
+      const mouse = { x: innerWidth / 2, y: innerHeight / 2 };
+      const previewPos = { x: mouse.x, y: mouse.y };
+      let previewOn = false;
+      function hidePreview() {
+        if (!previewOn) return;
+        previewOn = false;
+        preview.classList.remove('on');
+      }
+      window.addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+      featRows.forEach((row) => {
+        row.addEventListener('pointerenter', (e) => {
+          if (e.pointerType !== 'mouse') return;
+          const p = projects[Number(row.dataset.i)];
+          previewImg.src = shot(p.url, 800, 500);
+          if (!previewOn) { previewPos.x = mouse.x; previewPos.y = mouse.y; }
+          previewOn = true;
+          preview.classList.add('on');
+        });
+        row.addEventListener('pointerleave', hidePreview);
+      });
+      featList.addEventListener('click', (e) => {
+        const row = e.target.closest('.feat-row');
+        if (row) openProject(Number(row.dataset.i));
+      });
+
+      // /projetos — full grid + filters
+      const FILTERS = [
+        { id: 'all', label: 'Todos' },
+        { id: 'sistema', label: 'Sistemas' },
+        { id: 'site', label: 'Sites' },
+      ];
+      const ppGrid = document.getElementById('pp-grid');
+      ppGrid.innerHTML = projects
+        .map(
+          (p, i) => `
+        <button class="pp-card" data-i="${i}" data-cat="${p.cat}" aria-label="Abrir projeto ${p.name}">
+          <span class="ring ring-accent"></span>
+          <div class="pp-media">
+            <img loading="lazy" src="${shot(p.url, 1000, 625)}" alt="Prévia do site ${p.name}" />
           </div>
-          <div class="project-foot">
-            <span class="project-name">${p.name}</span>
-            <span class="project-tag">${p.tag}</span>
+          <div class="pp-body">
+            <span class="pp-num">${num(i)}</span>
+            <span class="pp-name">${p.name}</span>
+            <span class="pp-tag">${p.tag}</span>
+            <span class="pp-desc">${p.desc}</span>
           </div>
         </button>`
         )
         .join('');
+      const ppCards = [...ppGrid.querySelectorAll('.pp-card')];
 
-      const projectCards = [...grid.querySelectorAll('.project-card')];
+      const ppFilters = document.getElementById('pp-filters');
+      ppFilters.innerHTML = FILTERS.map((f) => {
+        const n = f.id === 'all' ? projects.length : projects.filter((p) => p.cat === f.id).length;
+        return `<button class="pp-filter${f.id === 'all' ? ' active' : ''}" data-filter="${f.id}" aria-pressed="${f.id === 'all'}">${f.label}<sup>${n}</sup></button>`;
+      }).join('');
+      ppFilters.addEventListener('click', (e) => {
+        const btn = e.target.closest('.pp-filter');
+        if (!btn) return;
+        const f = btn.dataset.filter;
+        ppFilters.querySelectorAll('.pp-filter').forEach((b) => {
+          b.classList.toggle('active', b === btn);
+          b.setAttribute('aria-pressed', String(b === btn));
+        });
+        // Re-run the entrance so the filtered set animates in instead of popping.
+        ppCards.forEach((c) => {
+          c.classList.remove('in');
+          c.hidden = f !== 'all' && c.dataset.cat !== f;
+        });
+        let k = 0;
+        ppCards.forEach((c) => {
+          if (c.hidden) return;
+          c.style.transitionDelay = (k++ % 2) * 0.08 + 's';
+          requestAnimationFrame(() => requestAnimationFrame(() => c.classList.add('in')));
+        });
+      });
+      ppGrid.addEventListener('click', (e) => {
+        const card = e.target.closest('.pp-card');
+        if (card) openProject(Number(card.dataset.i));
+      });
+
+      // Cards rise in as they enter the viewport (only while the page is shown).
+      const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting || document.body.classList.contains('is-transitioning')) return;
+          en.target.style.transitionDelay = (ppCards.indexOf(en.target) % 2) * 0.08 + 's';
+          en.target.classList.add('in');
+          cardObserver.unobserve(en.target);
+        });
+      }, { rootMargin: '0px 0px -8% 0px' });
+
+      function enterProjectsPage() {
+        setSectionState(pageSection, 'visible');
+        if (!played.page) { titles.page.classList.add('play'); played.page = true; }
+        // unobserve + observe forces a fresh callback for cards already on screen.
+        ppCards.forEach((c) => {
+          if (c.classList.contains('in')) return;
+          cardObserver.unobserve(c);
+          cardObserver.observe(c);
+        });
+      }
 
       // Modal wiring
       const modal = document.getElementById('project-modal');
@@ -1222,10 +1566,6 @@
         lenis.start();
       }
 
-      grid.addEventListener('click', (e) => {
-        const card = e.target.closest('.project-card');
-        if (card) openProject(Number(card.dataset.i));
-      });
       modal.addEventListener('click', (e) => {
         if (e.target.closest('[data-close]')) closeProject();
       });
@@ -1676,6 +2016,7 @@
       });
 
       // Jump to a section by scroll fraction (sections are scroll-driven).
+      // From /projetos, travel home first and then scroll.
       function scrollToFraction(f) {
         const max = document.documentElement.scrollHeight - document.documentElement.clientHeight;
         lenis.scrollTo(f * max, { duration: 1.6 });
@@ -1683,10 +2024,75 @@
       cardNavEl.querySelectorAll('[data-scroll]').forEach((el) => {
         el.addEventListener('click', (e) => {
           e.preventDefault();
-          scrollToFraction(parseFloat(el.dataset.scroll));
+          const f = parseFloat(el.dataset.scroll);
           toggleNav(false);
+          if (route === 'home') scrollToFraction(f);
+          else navigate('home', true, f > 0 ? () => scrollToFraction(f) : null);
         });
       });
+
+      /* =========================================================
+         ROUTER — home <-> /projetos without reloading the WebGL.
+         The particle morph itself is the page transition: the scene
+         scroll value is tweened to the galaxy (1.0) and back to 0,
+         passing through the big-bang flash.
+      ========================================================= */
+      const TITLES = {
+        home: 'NOVA IRIS — A new era of interaction',
+        projetos: 'Projetos — NOVA IRIS',
+      };
+      const routeFromPath = (p) => (p.replace(/\/+$/, '') === '/projetos' ? 'projetos' : 'home');
+      let route = routeFromPath(location.pathname);
+      document.body.dataset.route = route;
+      document.title = TITLES[route];
+      let sceneScroll = route === 'projetos' ? 1 : 0;
+      let trans = null;
+      const TRANS_MS = 1800;
+
+      function navigate(to, push = true, after = null) {
+        if (trans) return;
+        if (to === route) {
+          if (after) after();
+          else lenis.scrollTo(0, { duration: 1.4 });
+          return;
+        }
+        if (push) history.pushState({ route: to }, '', to === 'projetos' ? '/projetos' : '/');
+        document.title = TITLES[to];
+        toggleNav(false);
+        if (modal.classList.contains('open')) closeProject();
+        hidePreview();
+        document.body.classList.add('is-transitioning');
+        lenis.stop();
+        trans = {
+          from: sceneScroll,
+          to: to === 'projetos' ? 1 : 0,
+          start: performance.now(),
+          mid: false,
+          // Swap the DOM halfway, while both pages are faded out.
+          onMid() {
+            if (route === 'projetos') setSectionState(pageSection, 'before');
+            route = to;
+            document.body.dataset.route = to;
+            window.scrollTo(0, 0);
+            lenis.scrollTo(0, { immediate: true, force: true });
+            lastNavScroll = 0;
+          },
+          onEnd() {
+            document.body.classList.remove('is-transitioning');
+            lenis.start();
+            if (to === 'projetos') enterProjectsPage();
+            if (after) setTimeout(after, 60);
+          },
+        };
+      }
+
+      document.addEventListener('click', (e) => {
+        const a = e.target.closest('a[data-route]');
+        if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        navigate(a.dataset.route);
+      });
+      window.addEventListener('popstate', () => navigate(routeFromPath(location.pathname), false));
 
       // Hide on scroll-down, reveal on scroll-up (driven from the render loop).
       let navHidden = false;
@@ -1702,6 +2108,7 @@
          RENDER LOOP
       ========================================================= */
       let time = 0;
+      let pageSpin = 0;
       const INTRO_MS = 2600;
       let introStart = 0;
 
@@ -1732,50 +2139,78 @@
         else if (scrollTop < lastNavScroll - 4) setNavHidden(false);
         lastNavScroll = scrollTop;
 
+        // The scene follows the page scroll on the home, sits on the galaxy
+        // on /projetos, and is tweened between the two during a transition.
+        if (trans) {
+          const t = Math.min((now - trans.start) / TRANS_MS, 1);
+          const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          sceneScroll = trans.from + (trans.to - trans.from) * e;
+          if (!trans.mid && t >= 0.5) { trans.mid = true; trans.onMid(); }
+          if (t >= 1) { const done = trans; trans = null; done.onEnd(); }
+        } else {
+          sceneScroll = route === 'home' ? currentScroll : 1;
+        }
+        const s = sceneScroll;
+
         material.uniforms.uTime.value = time;
-        material.uniforms.uScroll.value = currentScroll;
+        material.uniforms.uScroll.value = s;
         bgMaterial.uniforms.uTime.value = time;
-        bgMaterial.uniforms.uScroll.value = currentScroll;
+        bgMaterial.uniforms.uScroll.value = s;
 
         // Camera + rotation
-        const panProgress = Math.min(currentScroll / 0.5, 1);
+        const panProgress = Math.min(s / 0.5, 1);
         const smoothPan = panProgress * panProgress * (3 - 2 * panProgress);
-        const flyPhase = currentScroll < 0.5 ? 0 : Math.min((currentScroll - 0.5) / 0.35, 1);
-        const blackHoleDive = currentScroll < 0.8 ? 0 : Math.min((currentScroll - 0.8) / 0.12, 1);
+        const flyPhase = s < 0.5 ? 0 : Math.min((s - 0.5) / 0.35, 1);
+        const blackHoleDive = s < 0.8 ? 0 : Math.min((s - 0.8) / 0.12, 1);
 
         camera.position.y = -38 * smoothPan + 5 * Math.pow(blackHoleDive, 2);
         camera.position.z = 8 - 4 * smoothPan - 55 * flyPhase;
 
-        const galaxyPullback = currentScroll < 0.93 ? 0 : Math.min((currentScroll - 0.93) / 0.07, 1);
+        const galaxyPullback = s < 0.93 ? 0 : Math.min((s - 0.93) / 0.07, 1);
         const smoothPullback = galaxyPullback * galaxyPullback * (3 - 2 * galaxyPullback);
         camera.position.z += 75 * smoothPullback;
         camera.position.y += 35 * smoothPullback;
 
         const lookX = 0;
         let waveTilt = 0;
-        if (currentScroll > 0.3 && currentScroll < 0.7) {
-          const tiltProgress = (currentScroll - 0.3) / 0.4;
+        if (s > 0.3 && s < 0.7) {
+          const tiltProgress = (s - 0.3) / 0.4;
           waveTilt = Math.sin(tiltProgress * Math.PI) * 15;
         }
         const lookY = THREE.MathUtils.lerp(camera.position.y + waveTilt, -33, smoothPullback);
         const lookZ = THREE.MathUtils.lerp(camera.position.z - 100, -120, smoothPullback);
 
-        const introZoom = (1 - introEased) * -3 * (1 - Math.min(currentScroll / 0.05, 1));
+        const introZoom = (1 - introEased) * -3 * (1 - Math.min(s / 0.05, 1));
         camera.position.z += introZoom;
         camera.lookAt(new THREE.Vector3(lookX, lookY, lookZ));
 
-        particles.rotation.y = smoothPan * Math.PI * 2;
+        // On /projetos the galaxy turns a little as you scroll the grid.
+        pageSpin += ((route === 'projetos' && !trans ? scrollTop * 0.0004 : 0) - pageSpin) * 0.06;
+        particles.rotation.y = smoothPan * Math.PI * 2 + pageSpin;
         particles.rotation.x = Math.sin(smoothPan * Math.PI) * 0.15;
         camera.rotation.z = 0;
 
+        // Desktop: slide the cloud right so the DNA sits beside the featured list.
+        const shiftGoal = route === 'home' && !trans && innerWidth >= 700 ? featShiftTarget * 2.4 : 0;
+        particles.position.x += (shiftGoal - particles.position.x) * 0.06;
+        // /projetos: drop the galaxy a bit so its bright core clears the header.
+        const dropGoal = route === 'projetos' && !trans ? -26 : 0;
+        particles.position.y += (dropGoal - particles.position.y) * 0.04;
+
         // Big-bang white flash
-        const glowScaleProgress = currentScroll < 0.9 ? 0 : Math.min((currentScroll - 0.9) / 0.03, 1);
+        const glowScaleProgress = s < 0.9 ? 0 : Math.min((s - 0.9) / 0.03, 1);
         const glowScale = Math.pow(glowScaleProgress, 4) * 400;
-        const hideGlow = currentScroll < 0.93 ? 0 : Math.min((currentScroll - 0.93) / 0.02, 1);
+        const hideGlow = s < 0.93 ? 0 : Math.min((s - 0.93) / 0.02, 1);
         glow.style.transform = `translate(-50%,-50%) scale(${glowScale})`;
         glow.style.opacity = 1 - hideGlow;
 
-        updateOverlays(currentScroll);
+        if (route === 'home' && !trans) updateOverlays(currentScroll);
+
+        if (previewOn) {
+          previewPos.x += (mouse.x - previewPos.x) * 0.14;
+          previewPos.y += (mouse.y - previewPos.y) * 0.14;
+          preview.style.transform = `translate3d(${previewPos.x + 28}px, ${previewPos.y - 106}px, 0)`;
+        }
 
         composer.render();
 
@@ -1787,6 +2222,7 @@
           setTimeout(() => {
             loader.classList.add('hidden');
             ready = true;
+            if (route === 'projetos') enterProjectsPage();
             setTimeout(() => loader.remove(), 850);
           }, 500);
         }
@@ -1800,6 +2236,7 @@
         if (!ready) {
           loader.classList.add('hidden');
           ready = true;
+          if (route === 'projetos') enterProjectsPage();
           setTimeout(() => loader.remove(), 850);
         }
       }, 5000);
